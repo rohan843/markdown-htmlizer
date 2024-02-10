@@ -2,6 +2,8 @@
 #include <stdio.h>
 %}
 
+%option noyywrap
+
 /* Headings */
 H1  ^\#\ [^\n]+$
 
