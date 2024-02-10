@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 void insertH1(char *text, int leng);
+void insertH2(char *text, int leng);
 %}
 
 %option noyywrap
@@ -23,11 +24,16 @@ considered a part of the heading syntax.
 [this link](https://www.markdownguide.org/basic-syntax/#headings).
 */
 H1  ^((\#[[:blank:]]+.*)|(.+\n\={3,}[[:blank:]]*))\n
+H2  ^((\#{2}[[:blank:]]+.*)|(.+\n\-{3,}[[:blank:]]*))\n
 
 %%
 
 {H1}    {
     insertH1(yytext, yyleng);
+}
+
+{H2}    {
+    insertH2(yytext, yyleng);
 }
 
 %%
@@ -58,6 +64,36 @@ void insertH1(char *const text, const int leng) {
         while(text[lim] != '\n') lim++;
         text[lim] = '\0';
         fprintf(yyout, "<h1>%s</h1>\n", text);
+        text[lim] = '\n';
+    }
+}
+
+/* 
+Inserts a given text verbatim within an H2 html tag after removing any markdown related syntax.
+(Does NOT escape characters such as '<' or '&').
+*/
+void insertH2(char *const text, const int leng) {
+    if(text[0] == '#') {
+        /* 
+        Writes a heading of the form
+            ## Heading 2
+        into the document by removing the `##` symbols and any whitespace after them.
+        */
+        int offset = 2;
+        while(offset < leng && (text[offset] == ' ' || text[offset] == '\t')) offset++;
+        fprintf(yyout, "<h2>%s</h2>\n", text + offset);
+    } else {
+        /* 
+        Writes a heading of the form
+            Heading 2
+            ---------
+        into the document by removing everything including and after the first `\n` (i.e., removes
+        all things after the first line).
+        */
+        int lim = 0;
+        while(text[lim] != '\n') lim++;
+        text[lim] = '\0';
+        fprintf(yyout, "<h2>%s</h2>\n", text);
         text[lim] = '\n';
     }
 }
