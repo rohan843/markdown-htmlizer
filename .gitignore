@@ -1,5 +1,6 @@
 *.exe
 
 output.*
+input.*
 
 lex.yy.c
