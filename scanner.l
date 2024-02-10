@@ -6,7 +6,22 @@ void insertH1(char *text, int leng);
 
 %option noyywrap
 
-/* Headings */
+/* 
+# Headings
+
+Rules:
+
+1. **Every heading must start at the beginning of some line**, i.e., _right before_ an intended 
+heading, there must be a newline ('\n') character (this character is not considered a part of the 
+heading syntax; it must _precede_ the heading).
+2. **Every heading is terminated by a newline**, i.e., we consider a given text string to be a
+heading only if a newline character ('\n') is the text string's last character. (Note: heading
+syntaxes might contain a newline character ('\n') themselves. This point merely says that the syntax
+requires the _last_ character to be newline too.) While scanning, this newline character is
+considered a part of the heading syntax.
+3. **The syntax between the 2 newline characters** comes from 
+[this link](https://www.markdownguide.org/basic-syntax/#headings).
+*/
 H1  ^((\#[[:blank:]]+.*)|(.+\n\={3,}[[:blank:]]*))\n
 
 %%
