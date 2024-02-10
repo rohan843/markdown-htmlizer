@@ -1,8 +1,9 @@
 %{
 #include <stdio.h>
 
-void insertH1(char *text, int leng);
-void insertH2(char *text, int leng);
+void insertH1(char *const text, int leng);
+void insertH2(char *const text, int leng);
+void insertH(char *const text, const int leng, const int heading_level);
 %}
 
 %option noyywrap
@@ -25,18 +26,63 @@ considered a part of the heading syntax.
 */
 H1  ^((\#[[:blank:]]+.*)|(.+\n\={3,}[[:blank:]]*))\n
 H2  ^((\#{2}[[:blank:]]+.*)|(.+\n\-{3,}[[:blank:]]*))\n
+H3  ^(\#{3}[[:blank:]]+.*)\n
+H4  ^(\#{4}[[:blank:]]+.*)\n
+H5  ^(\#{5}[[:blank:]]+.*)\n
+H6  ^(\#{6}[[:blank:]]+.*)\n
 
 %%
 
 {H1}    {
-    insertH1(yytext, yyleng);
+    insertH(yytext, yyleng, 1);
 }
 
 {H2}    {
-    insertH2(yytext, yyleng);
+    insertH(yytext, yyleng, 2);
+}
+
+{H3}    {
+    insertH(yytext, yyleng, 3);
+}
+
+{H4}    {
+    insertH(yytext, yyleng, 4);
+}
+
+{H5}    {
+    insertH(yytext, yyleng, 5);
+}
+
+{H6}    {
+    insertH(yytext, yyleng, 6);
 }
 
 %%
+
+/* 
+Inserts a given text verbatim within an H<heading_level> html tag after removing any markdown
+related syntax.
+(Does NOT escape characters such as '<' or '&').
+*/
+void insertH(char *const text, const int leng, const int heading_level) {
+    switch(heading_level) {
+        case 1: 
+            insertH1(text, leng);
+            break;
+        case 2: 
+            insertH2(text, leng);
+            break;
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+            ;
+            int offset = heading_level;
+            while(offset < leng && (text[offset] == ' ' || text[offset] == '\t')) offset++;
+            fprintf(yyout, "<h%d>%s</h%d>\n", heading_level, text + offset, heading_level);
+            break;
+    }
+}
 
 /* 
 Inserts a given text verbatim within an H1 html tag after removing any markdown related syntax.
