@@ -1,7 +1,13 @@
 %{
 #include <stdio.h>
 %}
+
+/* Headings */
+H1  ^#\ [^\n]+$
+
 %%
+
+{H1}
 
 %%
 
