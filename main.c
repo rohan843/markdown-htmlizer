@@ -8,7 +8,9 @@ int main()
     FILE *outputFile = fopen("output.html", "w");
     yyrestart(inputFile);
     yyout = outputFile;
+    fprintf(outputFile, "<html><body>\n");
     yylex();
+    fprintf(outputFile, "\n</body></html>");
     fclose(inputFile);
     fclose(outputFile);
     return 0;
