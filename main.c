@@ -1,7 +1,7 @@
-#include<stdio.h>
 #include "lex.yy.c"
 
-int main() {
-    
+int main()
+{
+
     return 0;
 }
